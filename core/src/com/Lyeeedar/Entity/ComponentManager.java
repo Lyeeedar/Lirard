@@ -3,6 +3,7 @@ package com.Lyeeedar.Entity;
 import java.util.BitSet;
 
 import com.Lyeeedar.Util.Bag;
+import com.Lyeeedar.Util.BitMask;
 
 /**
  * This class manages component mappers and provides a simple interface for extracting them.
@@ -20,10 +21,10 @@ public class ComponentManager
 
 	public void removeComponentsOfEntity(Entity e)
 	{
-		BitSet componentBits = e.componentMask;
-		for (int i = componentBits.nextSetBit(0); i >= 0; i = componentBits.nextSetBit(i + 1))
+		BitMask componentBits = e.componentMask;
+		for (int i = 0; i < 31; i++)
 		{
-			componentsByType.get(i).set(e.id, null);
+			if (componentBits.check(i)) componentsByType.get(i).set(e.id, null);
 		}
 		componentBits.clear();
 	}
@@ -39,7 +40,7 @@ public class ComponentManager
 
 	public void removeComponent(Entity e, ComponentType<?> type)
 	{
-		if (e.componentMask.get(type.index))
+		if (e.componentMask.check(type.index))
 		{
 			componentsByType.get(type.index).set(e.id, null);
 			e.componentMask.clear(type.index);

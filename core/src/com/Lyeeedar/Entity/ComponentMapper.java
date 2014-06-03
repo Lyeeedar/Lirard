@@ -10,16 +10,18 @@ import com.Lyeeedar.Util.Bag;
  */
 public class ComponentMapper<C extends Component> {
 
-	Bag<C> components;
+	public final Bag<C> components;
+	public final ComponentType<C> type;
 	
-	public ComponentMapper()
+	public ComponentMapper(ComponentType<C> type)
 	{
 		components = new Bag<C>();
+		this.type = type;
 	}
 	
 	public void clear(int index)
 	{
-		components.ensureCapacity(index);
+		if (index >= components.getCapacity()) return;
 		components.set(index, null);
 	}
 	
@@ -31,13 +33,13 @@ public class ComponentMapper<C extends Component> {
 	
 	public C get(int index)
 	{
-		components.ensureCapacity(index);
+		if (index >= components.getCapacity()) return null;
 		return components.get(index);
 	}
 	
 	public C get(Entity e)
 	{
-		components.ensureCapacity(e.id);
+		if (e.id >= components.getCapacity()) return null;
 		return components.get(e.id);
 	}
 }

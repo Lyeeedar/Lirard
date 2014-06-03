@@ -1,11 +1,14 @@
 package com.Lyeeedar.Entity.Components;
 
 import com.Lyeeedar.Entity.Component;
+import com.Lyeeedar.Lirard.GLOBALS;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 
 public class Position extends Component
 {
 	public final Vector3 position;
+	public final Matrix4 mat;
 	
 	public Position()
 	{
@@ -15,5 +18,13 @@ public class Position extends Component
 	public Position(float x, float y, float z)
 	{
 		position = new Vector3(x, y, z);
+		
+		mat = new Matrix4();
+		applyToMatrix();
+	}
+	
+	public void applyToMatrix()
+	{
+		mat.setToTranslation(position);
 	}
 }

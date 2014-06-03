@@ -25,6 +25,7 @@ public class VelocityProcessor extends Processor
 		Velocity v = vm.get(e);
 		
 		p.position.add(v.velocity.x*delta, v.velocity.y*delta, v.velocity.z*delta);
+		p.applyToMatrix();
 	}
 
 	@Override

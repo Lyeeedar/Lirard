@@ -18,7 +18,5 @@ public abstract class GraphicsObject
 	public Matrix4 getTransform()
 	{
 		return transform;
-	}
-	
-	public abstract int compareTo(GraphicsObject object);
+	}	
 }

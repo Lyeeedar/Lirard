@@ -8,6 +8,8 @@ import com.Lyeeedar.Entity.EntityWorld;
 import com.Lyeeedar.Entity.Processor;
 import com.Lyeeedar.Entity.Components.LODModel;
 import com.Lyeeedar.Entity.Components.Position;
+import com.Lyeeedar.Entity.Components.Rotation;
+import com.Lyeeedar.Entity.Components.Scale;
 import com.Lyeeedar.Entity.Components.Velocity;
 import com.Lyeeedar.Entity.Processors.RenderProcessor;
 import com.Lyeeedar.Entity.Processors.VelocityProcessor;
@@ -44,7 +46,7 @@ public class MainGame extends ApplicationAdapter
 		spriteBatch = new SpriteBatch();
 		
 		ModelBatchData[] data = new ModelBatchData[10];
-		data[0] = new ModelBatchData(Shapes.getBoxMesh(10, 10, 10, true, true), GL30.GL_TRIANGLES, new Texture[]{FileUtils.loadTexture("data/textures/grass2.png", true, null, null)}, false, false, 1);
+		data[0] = new ModelBatchData(Shapes.getBoxMesh(10, 10, 10, true, true), GL30.GL_TRIANGLES, new Texture[]{FileUtils.loadTexture("data/textures/blank.png", true, null, null)}, false, false, 1);
 		data[1] = new ModelBatchData(Shapes.getBoxMesh(10, 10, 10, true, true), GL30.GL_TRIANGLES, new Texture[]{FileUtils.loadTexture("data/textures/stone01.png", true, null, null)}, false, false, 1);
 		data[2] = new ModelBatchData(Shapes.getBoxMesh(10, 10, 10, true, true), GL30.GL_TRIANGLES, new Texture[]{FileUtils.loadTexture("data/textures/stone02.png", true, null, null)}, false, false, 1);
 		data[3] = new ModelBatchData(Shapes.getBoxMesh(10, 10, 10, true, true), GL30.GL_TRIANGLES, new Texture[]{FileUtils.loadTexture("data/textures/stone03.png", true, null, null)}, false, false, 1);
@@ -71,16 +73,18 @@ public class MainGame extends ApplicationAdapter
 		
 		e = world.createEntity();
 		e.addComponent(new Position(10, 10, -20));
-		e.addComponent(new Velocity(10, 1, 1));
+		//e.addComponent(new Velocity(10, 1, 1));
 		e.addComponent(new LODModel(new ModelBatchInstance(data[0])));
 		
 		Random ran = new Random();
-		for (int i = 0; i < 60000; i++)
+		for (int i = 0; i < 100000; i++)
 		{
 			Entity t = world.createEntity();
-			t.addComponent(new Position(ran.nextFloat()*50-25, ran.nextFloat()*50-25, ran.nextFloat()*50-25));
-			t.addComponent(new Velocity(ran.nextFloat()*50-25, ran.nextFloat()*50-25, ran.nextFloat()*50-25));
-			t.addComponent(new LODModel(new ModelBatchInstance(data[1])));
+			t.addComponent(new Position(ran.nextFloat()*500-250, ran.nextFloat()*500-250, ran.nextFloat()*500-250));
+			t.addComponent(new Scale(ran.nextFloat()*2, ran.nextFloat()*2, ran.nextFloat()*2));
+			t.addComponent(new Rotation(ran.nextFloat(), ran.nextFloat(), ran.nextFloat()));
+			//t.addComponent(new Velocity(ran.nextFloat()*50-25, ran.nextFloat()*50-25, ran.nextFloat()*50-25));
+			t.addComponent(new LODModel(new ModelBatchInstance(data[ran.nextInt(10)])));
 		}
 	}
 

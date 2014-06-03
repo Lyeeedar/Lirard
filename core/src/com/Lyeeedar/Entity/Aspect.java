@@ -2,6 +2,8 @@ package com.Lyeeedar.Entity;
 
 import java.util.BitSet;
 
+import com.Lyeeedar.Util.BitMask;
+
 /**
  * An Aspects is used by systems as a matcher against entities, to check if a
  * system is interested in an entity. Aspects define what sort of component
@@ -30,15 +32,15 @@ import java.util.BitSet;
  */
 public class Aspect
 {
-	private BitSet allSet;
-	private BitSet exclusionSet;
-	private BitSet oneSet;
+	private BitMask allSet;
+	private BitMask exclusionSet;
+	private BitMask oneSet;
 
 	private Aspect()
 	{
-		this.allSet = new BitSet();
-		this.exclusionSet = new BitSet();
-		this.oneSet = new BitSet();
+		this.allSet = new BitMask();
+		this.exclusionSet = new BitMask();
+		this.oneSet = new BitMask();
 	}
 
 	/**
@@ -47,13 +49,13 @@ public class Aspect
 	 * @param mask
 	 * @return valid
 	 */
-	public boolean check(BitSet mask)
+	public boolean check(BitMask mask)
 	{
 		boolean valid = true;
 
 		if (valid && !exclusionSet.isEmpty())
 		{
-			if (mask.intersects(exclusionSet))
+			if (mask.intersect(exclusionSet))
 			{
 				valid = false;
 			}
@@ -61,7 +63,7 @@ public class Aspect
 		
 		if (valid && !oneSet.isEmpty())
 		{
-			if (!mask.intersects(oneSet))
+			if (!mask.intersect(oneSet))
 			{
 				valid = false;
 			}
@@ -69,32 +71,13 @@ public class Aspect
 		
 		if (valid && !allSet.isEmpty())
 		{
-			for (int i = allSet.nextSetBit(0); i >= 0; i = allSet.nextSetBit(i + 1))
+			if (!mask.compare(allSet))
 			{
-				if (!mask.get(i))
-				{
-					valid = false;
-					break;
-				}
+				valid = false;
 			}
 		}
 
 		return valid;
-	}
-
-	protected BitSet getAllSet()
-	{
-		return allSet;
-	}
-
-	protected BitSet getExclusionSet()
-	{
-		return exclusionSet;
-	}
-
-	protected BitSet getOneSet()
-	{
-		return oneSet;
 	}
 
 	/**

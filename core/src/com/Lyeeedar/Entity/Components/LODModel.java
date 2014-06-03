@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.Texture;
 
 public class LODModel extends Component
 {
-	public GraphicsObject model;
+	public ModelBatchInstance model;
 	
 	public LODModel(ModelBatchInstance model)
 	{

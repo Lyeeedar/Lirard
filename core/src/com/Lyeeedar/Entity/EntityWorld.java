@@ -43,13 +43,16 @@ public class EntityWorld
 	
 	public void process(float delta)
 	{
-		for (int i = 0; i < em.entities.size; i++)
+		int esize = em.entities.size;
+		int psize = processors.size;
+		for (int i = 0; i < esize; i++)
 		{
 			Entity e = em.entities.get(i);
 			if (e == null) continue;
 			
-			for (Processor p : processors)
+			for (int j = 0; j < psize; j++)
 			{
+				Processor p = processors.get(j);
 				if (p.aspect.check(e.componentMask))
 				{
 					p.process(e, delta);

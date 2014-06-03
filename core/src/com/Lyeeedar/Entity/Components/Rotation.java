@@ -2,12 +2,14 @@ package com.Lyeeedar.Entity.Components;
 
 import com.Lyeeedar.Entity.Component;
 import com.Lyeeedar.Lirard.GLOBALS;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 
 public class Rotation extends Component
 {
 	public final Vector3 rotation;
 	public final Vector3 up;
+	public final Matrix4 mat;
 	
 	public Rotation()
 	{
@@ -21,7 +23,15 @@ public class Rotation extends Component
 	
 	public Rotation(float rx, float ry, float rz, float ux, float uy, float uz)
 	{
-		this.rotation = new Vector3(rx, ry, rz);
-		this.up = new Vector3(ux, uy, uz);
+		this.rotation = new Vector3(rx, ry, rz).nor();
+		this.up = new Vector3(ux, uy, uz).nor();
+		
+		mat = new Matrix4();
+		applyToMatrix();
+	}
+	
+	public void applyToMatrix()
+	{
+		mat.setToRotation(GLOBALS.DEFAULT_ROTATION, rotation);
 	}
 }

@@ -5,6 +5,7 @@ import java.nio.IntBuffer;
 
 import com.Lyeeedar.Graphics.GraphicsSorter.GraphicsInstance;
 import com.Lyeeedar.Graphics.ModelBatchInstance.ModelBatchData;
+import com.Lyeeedar.Graphics.ModelBatchInstance.ModelBatchData.BatchedInstance;
 import com.Lyeeedar.Graphics.Lights.LightManager;
 import com.Lyeeedar.Lirard.GLOBALS;
 import com.badlogic.gdx.Gdx;
@@ -29,9 +30,7 @@ public class InstanceRenderer
 	private ShaderProgram shader;
 	
 	private UniformBufferObject ubo;
-	
-	private final Array<InstanceBin> bins = new Array<InstanceBin>(false, 8);
-	
+		
 	private ModelBatchData bound = null;
 	
 	public InstanceRenderer()
@@ -50,43 +49,41 @@ public class InstanceRenderer
 	
 	public void render(GraphicsSorter sorter, LightManager lights, Camera cam)
 	{
-		while (!sorter.instances.isEmpty())
+		for (ModelBatchData data : sorter.data)
 		{
-			GraphicsInstance ginst = sorter.instances.poll();
-			GraphicsObject obj = ginst.object;
-			ModelBatchInstance inst = (ModelBatchInstance) obj;
-			
-			render(inst.data, inst.transform, lights, cam);
-			
-			sorter.free(ginst);
+			render(data, lights, cam);
 		}
 		end(lights, cam);
+		sorter.clear();
 	}
 	
-	public void render(ModelBatchData data, Matrix4 transform, LightManager lights, Camera cam)
+	public void render(ModelBatchData data, LightManager lights, Camera cam)
 	{
-		InstanceBin bin = null;
+		beginData(data, lights, cam);
 		
-		if (data.bin != null)
-		{
-			bin = data.bin;
-		}
-		else
-		{
-			bin = pool.obtain();
-			bin.set(data);
+		int i = 0;
+		FloatBuffer floatbuffer = ubo.getDataBuffer().asFloatBuffer();
+		while (!data.instances.isEmpty())
+		{			
+			BatchedInstance bi = data.instances.poll();
+			floatbuffer.put(bi.transform.val);
 			
-			bins.add(bin);
-			data.bin = bin;
+			i++;
+			if (i == MAX_INSTANCES)
+			{
+				ubo.bind();
+				data.mesh.renderInstanced(shader, data.primitive_type, i);
+				i = 0;
+				floatbuffer = ubo.getDataBuffer().asFloatBuffer();
+			}
+			
+			data.pool.free(bi);
 		}
 		
-		bin.add(transform);
-		
-		if (bin.isFull())
+		if (i > 0)
 		{
-			bins.removeValue(data.bin, true);
-			data.bin = null;
-			flush(bin, lights, cam);
+			ubo.bind();
+			data.mesh.renderInstanced(shader, data.primitive_type, i);
 		}
 	}
 	
@@ -127,52 +124,11 @@ public class InstanceRenderer
 	}
 	
 	public void end(LightManager lights, Camera cam)
-	{
-		if (bins.size > 0)
-		{
-			for (InstanceBin bin : bins)
-			{
-				flush(bin, lights, cam);
-				bin.data.bin = null;
-			}
-			pool.freeAll(bins);
-			bins.clear();
-		}
-		
+	{	
 		if (shader != null) shader.end();
 		shader = null;
 		
 		bound = null;
-	}
-	
-	private void flush(InstanceBin bin, LightManager lights, Camera cam)
-	{
-		beginData(bin.data, lights, cam);
-		
-		int i = 0;
-		
-		FloatBuffer floatbuffer = ubo.getDataBuffer().asFloatBuffer();
-		for (int t = 0; t < bin.transforms.size; t++)
-		{
-			floatbuffer.put(bin.transforms.get(t).val);
-			
-			i++;
-			if (i == MAX_INSTANCES)
-			{
-				ubo.bind();
-				bin.data.mesh.renderInstanced(shader, bin.data.primitive_type, i);
-				i = 0;
-				floatbuffer = ubo.getDataBuffer().asFloatBuffer();
-			}
-		}
-		
-		if (i > 0)
-		{
-			ubo.bind();
-			bin.data.mesh.renderInstanced(shader, bin.data.primitive_type, i);
-		}
-		
-		pool.free(bin);
 	}
 	
 	private void loadShaders()
@@ -193,42 +149,4 @@ public class InstanceRenderer
 		noSamplingShader.registerUniformBlock("InstanceBlock", 1);
 	}
 
-	private Pool<InstanceBin> pool = new Pool<InstanceBin>()
-			{
-				@Override
-				protected InstanceBin newObject()
-				{
-					return new InstanceBin(MAX_INSTANCES);
-				}
-			};
-	
-	public static class InstanceBin
-	{
-		public final Array<Matrix4> transforms = new Array<Matrix4>();
-		public ModelBatchData data;
-		//private int i = 0;
-		
-		public InstanceBin(int binSize)
-		{
-			//transforms = new Matrix4[binSize];
-		}
-		
-		public void set(ModelBatchData data)
-		{
-			this.data = data;
-			transforms.clear();
-			//i = 0;
-		}
-		
-		public void add(Matrix4 transform)
-		{
-			transforms.add(transform);
-			//transforms[i++] = transform;
-		}
-		
-		public boolean isFull()
-		{
-			return false;//i == transforms.length;
-		}
-	}
 }

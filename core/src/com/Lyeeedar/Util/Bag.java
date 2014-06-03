@@ -7,7 +7,7 @@ package com.Lyeeedar.Util;
 
 public class Bag<E>
 {
-	private E[] data;
+	public E[] data;
 	public int size = 0;
 
 	/**
@@ -16,7 +16,7 @@ public class Bag<E>
 	 */
 	public Bag()
 	{
-		this(64);
+		this(32);
 	}
 
 	/**

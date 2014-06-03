@@ -1,31 +1,35 @@
 package com.Lyeeedar.Graphics;
 
-import java.util.PriorityQueue;
-
+import com.Lyeeedar.Graphics.ModelBatchInstance.ModelBatchData;
 import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
-import com.badlogic.gdx.utils.Pools;
 
 public class GraphicsSorter
 {
 	public final Camera cam;
-	public final PriorityQueue<GraphicsInstance> instances = new PriorityQueue<GraphicsInstance>();
+	public final Array<ModelBatchData> data = new Array<ModelBatchData>(false, 16);
 
 	public GraphicsSorter(Camera cam)
 	{
 		this.cam = cam;
 	}
 
-	public void add(GraphicsObject object)
+	public void add(ModelBatchInstance object)
 	{
-		float dist = object.distance(cam);
-		instances.add(pool.obtain().set(object, dist));
+		object.data.add(object.transform, cam);
+		
+		if (!object.data.added)
+		{
+			data.add(object.data);
+			object.data.added = true;
+		}
 	}
 
 	public void clear()
 	{
-		while (!instances.isEmpty())
-			pool.free(instances.poll());
+		for (ModelBatchData d : data) d.added = false;
+		data.clear();
 	}
 	
 	public void free(GraphicsInstance instance)

@@ -10,7 +10,7 @@ import java.util.HashMap;
  */
 public class ComponentType<c extends Component>
 {
-	public static int TOTAL = 0;
+	public static int TOTAL = 1;
 
 	public final int index;
 	public final Class<c> type;
@@ -19,6 +19,8 @@ public class ComponentType<c extends Component>
 	{
 		index = TOTAL++;
 		this.type = type;
+		
+		if (TOTAL > 31) throw new RuntimeException("Too many components! Cant have more than 31 cause of bitmask stuff!");
 	}
 
 	@Override
@@ -29,7 +31,7 @@ public class ComponentType<c extends Component>
 	
 	public ComponentMapper<c> mapperFromType()
 	{
-		return new ComponentMapper<c>();
+		return new ComponentMapper<c>(this);
 	}
 
 	private static HashMap<Class<? extends Component>, ComponentType<? extends Component>> componentTypes = new HashMap<Class<? extends Component>, ComponentType<? extends Component>>();

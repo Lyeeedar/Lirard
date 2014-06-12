@@ -9,7 +9,6 @@ public class Rotation extends Component
 {
 	public final Vector3 rotation;
 	public final Vector3 up;
-	public final Matrix4 mat;
 	
 	public Rotation()
 	{
@@ -25,13 +24,5 @@ public class Rotation extends Component
 	{
 		this.rotation = new Vector3(rx, ry, rz).nor();
 		this.up = new Vector3(ux, uy, uz).nor();
-		
-		mat = new Matrix4();
-		applyToMatrix();
-	}
-	
-	public void applyToMatrix()
-	{
-		mat.setToRotation(GLOBALS.DEFAULT_ROTATION, rotation);
 	}
 }

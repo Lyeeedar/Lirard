@@ -6,11 +6,13 @@ import com.Lyeeedar.Entity.Aspect;
 import com.Lyeeedar.Entity.Entity;
 import com.Lyeeedar.Entity.EntityWorld;
 import com.Lyeeedar.Entity.Processor;
+import com.Lyeeedar.Entity.Components.ComposedMatrix;
 import com.Lyeeedar.Entity.Components.LODModel;
 import com.Lyeeedar.Entity.Components.Position;
 import com.Lyeeedar.Entity.Components.Rotation;
 import com.Lyeeedar.Entity.Components.Scale;
 import com.Lyeeedar.Entity.Components.Velocity;
+import com.Lyeeedar.Entity.Processors.ComposedMatrixProcessor;
 import com.Lyeeedar.Entity.Processors.RenderProcessor;
 import com.Lyeeedar.Entity.Processors.VelocityProcessor;
 import com.Lyeeedar.Graphics.DeferredRenderer;
@@ -64,10 +66,13 @@ public class MainGame extends ApplicationAdapter
 		cam.update();
 		
 		Processor p = new VelocityProcessor();
-		p.addToWorld(world);
+		world.addProcessor(p);
 		
 		RenderProcessor rp = new RenderProcessor(cam);
-		rp.addToWorld(world);
+		world.addProcessor(rp);
+		
+		ComposedMatrixProcessor cmp = new ComposedMatrixProcessor();
+		world.addChangeProcessor(cmp);
 		
 		renderer = new DeferredRenderer(rp);
 		
@@ -75,6 +80,7 @@ public class MainGame extends ApplicationAdapter
 		e.addComponent(new Position(10, 10, -20));
 		//e.addComponent(new Velocity(10, 1, 1));
 		e.addComponent(new LODModel(new ModelBatchInstance(data[0])));
+		e.addComponent(new ComposedMatrix());
 		
 		Random ran = new Random();
 		for (int i = 0; i < 100000; i++)
@@ -85,6 +91,7 @@ public class MainGame extends ApplicationAdapter
 			t.addComponent(new Rotation(ran.nextFloat(), ran.nextFloat(), ran.nextFloat()));
 			//t.addComponent(new Velocity(ran.nextFloat()*50-25, ran.nextFloat()*50-25, ran.nextFloat()*50-25));
 			t.addComponent(new LODModel(new ModelBatchInstance(data[ran.nextInt(10)])));
+			t.addComponent(new ComposedMatrix());
 		}
 	}
 

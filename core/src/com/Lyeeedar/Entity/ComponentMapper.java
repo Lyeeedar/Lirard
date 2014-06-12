@@ -19,25 +19,25 @@ public class ComponentMapper<C extends Component> {
 		this.type = type;
 	}
 	
-	public void clear(int index)
+	public final void clear(final int index)
 	{
 		if (index >= components.getCapacity()) return;
 		components.set(index, null);
 	}
 	
-	public void set(int index, C c)
+	public final void set(final int index, final C c)
 	{
 		components.ensureCapacity(index);
 		components.set(index, c);
 	}
 	
-	public C get(int index)
+	public final C get(final int index)
 	{
 		if (index >= components.getCapacity()) return null;
 		return components.get(index);
 	}
 	
-	public C get(Entity e)
+	public final C get(final Entity e)
 	{
 		if (e.id >= components.getCapacity()) return null;
 		return components.get(e.id);

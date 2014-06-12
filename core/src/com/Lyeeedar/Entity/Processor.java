@@ -5,23 +5,24 @@ package com.Lyeeedar.Entity;
  * @author Philip Collin
  *
  */
-public abstract class Processor 
+public abstract class Processor implements Comparable<Processor>
 {
 	public final Aspect aspect;
-	protected EntityWorld world;
+	public EntityWorld world;
+	protected final int priority;
 	
-	public Processor(Aspect aspect)
+	public Processor(Aspect aspect, int priority)
 	{
 		this.aspect = aspect;
+		this.priority = priority;
 	}
 	
-	public void addToWorld(EntityWorld world)
+	@Override
+	public int compareTo(Processor o)
 	{
-		this.world = world;
-		world.processors.add(this);
-		obtainMappers();
+		return priority - o.priority;
 	}
 	
 	protected abstract void obtainMappers();
-	public abstract void process(Entity e, float delta);
+	public abstract void process(final Entity e, final float delta);
 }

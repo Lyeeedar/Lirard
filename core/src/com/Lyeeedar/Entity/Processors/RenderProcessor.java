@@ -16,44 +16,29 @@ import com.badlogic.gdx.math.Vector3;
 
 public class RenderProcessor extends Processor
 {
-	private ComponentMapper<Position> pm;
 	private ComponentMapper<LODModel> lm;
-	private ComponentMapper<Rotation> rm;
-	private ComponentMapper<Scale> sm;
 		
 	public final GraphicsSorter sorter;
 	public final Camera cam;
 	
 	public RenderProcessor(Camera cam)
 	{
-		super(Aspect.getAspectForAll(LODModel.class));
+		super(Aspect.getAspectForAll(LODModel.class), 1);
 		this.sorter = new GraphicsSorter(cam);
 		this.cam = cam;
 	}
 
 	@Override
-	protected void obtainMappers()
+	protected final void obtainMappers()
 	{
-		pm = world.getMapper(Position.class);
 		lm = world.getMapper(LODModel.class);
-		rm = world.getMapper(Rotation.class);
-		sm = world.getMapper(Scale.class);
 	}
 
 	@Override
-	public void process(Entity e, float delta)
+	public final void process(final Entity e, final float delta)
 	{
-		Position p = pm.get(e);
-		Rotation r = rm.get(e);
-		Scale s = sm.get(e);
-		LODModel l = lm.get(e);;
-		
-		Matrix4 transform = l.model.getTransform();
-		if (p != null) transform.set(p.mat);
-		if (s != null) transform.mul(s.mat);
-		if (r != null) transform.mul(r.mat);
+		final LODModel l = lm.get(e.id);
 		
 		sorter.add(l.model);
 	}
-
 }

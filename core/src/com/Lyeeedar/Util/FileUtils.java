@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 import com.Lyeeedar.Graphics.ModelBatchInstance.ModelBatchData;
-import com.Lyeeedar.Graphics.Particles.ParticleEffect;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Mesh;
@@ -14,6 +13,7 @@ import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.TextureArray;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g3d.Model;
@@ -21,8 +21,6 @@ import com.badlogic.gdx.graphics.g3d.loader.G3dModelLoader;
 import com.badlogic.gdx.graphics.g3d.loader.ObjLoader;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.JsonReader;
-import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.UBJsonReader;
 
 public class FileUtils
@@ -275,49 +273,6 @@ public class FileUtils
 			hash.put(size, block);
 		}
 		return font;
-	}
-
-	private static HashMap<String, ParticleEffect> loadedEffects = new HashMap<String, ParticleEffect>();
-
-	public static ParticleEffect loadParticleEffect(String name)
-	{
-		if (loadedEffects.containsKey(name)) { return loadedEffects.get(name).copy(); }
-
-		if (!Gdx.files.internal(name).exists()) { throw new RuntimeException("Effect " + name + " does not exist!"); }
-
-		Json json = new Json();
-		ParticleEffect effect = json.fromJson(ParticleEffect.class, Gdx.files.internal(name));
-		effect.name = name;
-		effect.dispose();
-
-		loadedEffects.put(name, effect);
-
-		return effect;
-	}
-
-	private static HashMap<String, Array<ParticleEffect>> pooledEffects = new HashMap<String, Array<ParticleEffect>>();
-
-	public static ParticleEffect obtainParticleEffect(String name)
-	{
-		Array<ParticleEffect> pool = null;
-		if (pooledEffects.containsKey(name))
-		{
-			pool = pooledEffects.get(name);
-			if (pool.size > 0) { return pool.removeIndex(0); }
-		}
-
-		if (pool == null)
-		{
-			pool = new Array<ParticleEffect>(false, 16);
-			pooledEffects.put(name, pool);
-		}
-
-		return loadParticleEffect(name);
-	}
-
-	public static void freeParticleEffect(ParticleEffect effect)
-	{
-		pooledEffects.get(effect.name).add(effect);
 	}
 
 	private static final HashMap<String, Texture> loadedTextures = new HashMap<String, Texture>();

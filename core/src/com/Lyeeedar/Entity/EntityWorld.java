@@ -12,12 +12,16 @@ public class EntityWorld
 	ComponentManager cm;
 	EntityManager em;
 	Array<Processor> processors;
+	Array<Processor> changeProcessors;
+	Array<Entity> changedEntities;
 	
 	public EntityWorld()
 	{
 		cm = new ComponentManager();
 		em = new EntityManager();
 		processors = new Array<Processor>(false, 8);
+		changeProcessors = new Array<Processor>(false, 8);
+		changedEntities = new Array<Entity>(false, 8);
 	}
 	
 	public void linkEntityComponent(Entity e, Component c)
@@ -27,7 +31,9 @@ public class EntityWorld
 	
 	public Entity createEntity()
 	{
-		return em.createEntityInstance(this);
+		Entity e = em.createEntityInstance(this);
+		changedEntities.add(e);
+		return e;
 	}
 	
 	public <c extends Component> ComponentMapper<c> getMapper(ComponentType<c> type)
@@ -39,6 +45,27 @@ public class EntityWorld
 	{
 		ComponentType<c> type = ComponentType.getTypeFor(clss);
 		return cm.getComponentsByType(type);
+	}
+	
+	public void addProcessor(Processor p)
+	{
+		p.world = this;
+		processors.add(p);
+		processors.sort();
+		p.obtainMappers();
+	}
+	
+	public void addChangeProcessor(Processor p)
+	{
+		p.world = this;
+		changeProcessors.add(p);
+		changeProcessors.sort();
+		p.obtainMappers();
+	}
+	
+	public void entityChanged(Entity e)
+	{
+		changedEntities.add(e);
 	}
 	
 	public void process(float delta)
@@ -59,5 +86,22 @@ public class EntityWorld
 				}
 			}
 		}
+		
+		int cesize = changedEntities.size;
+		int cpsize = changeProcessors.size;
+		for (int i = 0; i < cesize; i++)
+		{
+			Entity e = changedEntities.get(i);
+			for (int j = 0; j < cpsize; j++)
+			{
+				Processor p = changeProcessors.get(j);
+				if (p.aspect.check(e.componentMask))
+				{
+					p.process(e, delta);
+				}
+			}
+		}
+		
+		changedEntities.clear();
 	}
 }
